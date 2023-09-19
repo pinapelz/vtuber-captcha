@@ -192,7 +192,7 @@ def generate_organization_captcha(org):
                 question['answer'] = False 
         return_data = {
             "category": "affiliation",
-            "title": "Select all the VTuber affiliated with "+org,
+            "title": "Select all the VTubers affiliated with "+org,
             "questions": question_data,
             "onFail": {
                 "text": "You got some wrong",
