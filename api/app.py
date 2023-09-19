@@ -1,4 +1,5 @@
 from flask import Flask, render_template, jsonify, request
+from flask_cors import CORS
 import configparser
 import psycopg2
 from psycopg2 import Error
@@ -7,6 +8,7 @@ import secrets
 import string
 
 app = Flask(__name__)
+CORS(app)
 
 class PostgresHandler:
     def __init__(self, username: str, password: str, host_name: str, port: int, database: str):
