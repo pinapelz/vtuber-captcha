@@ -1,0 +1,113 @@
+#recaptcha-container {
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    padding: 20px;
+    width: 440px;
+    margin: 50px auto;
+    background-color: #f4f4f4;
+  }
+
+  .recaptcha-header {
+    background-color: #0079c1;
+    color: #fff;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .recaptcha-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+  }
+
+  .submit-btn {
+    display: block;
+    margin: 10px auto 20px;
+    /* This will center the button horizontally and give it a margin at the bottom */
+    padding: 10px 15px;
+    background-color: #0079c1;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .submit-btn:hover {
+    background-color: #005a91;
+  }
+
+  .recaptcha-image {
+    width: 90px;
+    height: 90px;
+    margin: 2px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+    background-size: cover;
+    background-position: center;
+    /* Ensure the image is centered */
+    position: relative;
+    overflow: hidden;
+  }
+
+  .regenerate-btn {
+    display: block;
+    margin: 10px auto;
+    /* This will center the button horizontally */
+  }
+
+  .recaptcha-image > svg {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 30px;
+    height: 30px;
+  }
+
+  .selected {
+    border-color: blue;
+    transform: scale(0.8);
+  }
+
+  .selected > svg {
+    display: block;
+  }
+
+  #answer-table-container {
+    margin-top: 20px;
+    border: 1px solid #ddd;
+    width: 100%;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#answer-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#answer-table th, #answer-table td {
+    border: 1px solid #ddd;
+    padding: 8px 12px;
+    text-align: left;
+}
+
+#answer-table th {
+    background-color: #f2f2f2;
+}
+
+#answer-table tbody tr:hover {
+    background-color: #eaeaea;
+}
+
+#answer-table td img {
+    max-width: 100%;
+    height: auto;
+}
