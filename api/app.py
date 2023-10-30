@@ -1,6 +1,5 @@
 from flask import Flask, render_template, jsonify, request
 from flask_cors import CORS
-import configparser
 import psycopg2
 from psycopg2 import Error
 import os
@@ -112,34 +111,20 @@ class PostgresHandler:
     
     def close_connection(self):
         self._connection.close()
-      
 
-parser = configparser.ConfigParser()
-parser.read("config.ini")
-CONFIG = parser
-
-def create_database_connection(auth_append: str = ""):
+def create_database_connection():
     """
     Creates a database connection using the environment variables
-    If not available use the config.ini file
     :param: auth_append: str = "" - If you want to use a different set of variables for persisitance of sessions
-
-    auth_append will be specified in usage when waiting for user's answers, this DB will track/verify answers
     """
-    if os.environ.get(auth_append+"DB_HOSTNAME") is not None:
-        hostname = os.environ.get(auth_append+"DB_HOSTNAME")
-        user = os.environ.get(auth_append+"DB_USER")
-        password = os.environ.get(auth_append+"DB_PASSWORD")
-        database = os.environ.get(auth_append+"DB_DATABASE")
-    else:
-        hostname = CONFIG.get(auth_append+"database", "host")
-        user = CONFIG.get(auth_append+"database", "user")
-        password = CONFIG.get(auth_append+"database", "password")
-        database = CONFIG.get(auth_append+"database", "database")
+    hostname = os.environ.get("POSTGRES_URL")
+    user = os.environ.get("POSTGRES_USER")
+    password = os.environ.get("POSTGRES_PASSWORD")
+    database = os.environ.get("POSTGRES_DATABASE")
     return PostgresHandler(host_name=hostname, username=user, password=password, database=database, port=5432)
 
 def initialize_auth_database():
-    server = create_database_connection("AUTH_")
+    server = create_database_connection()
     server.create_table("sessions", "session_id VARCHAR(255) PRIMARY KEY, answer VARCHAR(1000), created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     server.close_connection()
 initialize_auth_database()
@@ -167,7 +152,7 @@ def generate_organization_captcha(org):
     server.close_connection()
     question_data = [{"image": question[3], "name": question[1], "affiliation": question[2], "id": question[0] } for question in correct_answers + random_answers]
     if create_session:
-        server = create_database_connection("AUTH_")
+        server = create_database_connection()
         session_id = secrets.token_urlsafe(16)
         solutions = []
         for question in question_data:
@@ -205,7 +190,7 @@ def generate_organization_captcha(org):
 def verify_answers():
     session_id = request.form.get('session')
     answer = request.form.get('answer')
-    server = create_database_connection("AUTH_")
+    server = create_database_connection()
     if server.check_health() is False:
         return jsonify({"error": "Cannot connect to verification database"}), 500
     if server.check_row_exists("sessions", "session_id", session_id) is False:
