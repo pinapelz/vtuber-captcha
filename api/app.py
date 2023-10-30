@@ -117,7 +117,7 @@ def create_database_connection():
     Creates a database connection using the environment variables
     :param: auth_append: str = "" - If you want to use a different set of variables for persisitance of sessions
     """
-    hostname = os.environ.get("POSTGRES_URL")
+    hostname = os.environ.get("POSTGRES_HOST")
     user = os.environ.get("POSTGRES_USER")
     password = os.environ.get("POSTGRES_PASSWORD")
     database = os.environ.get("POSTGRES_DATABASE")
