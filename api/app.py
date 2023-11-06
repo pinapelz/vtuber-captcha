@@ -4,7 +4,6 @@ import psycopg2
 from psycopg2 import Error
 import os
 import secrets
-import string
 
 app = Flask(__name__)
 CORS(app)
@@ -28,6 +27,12 @@ class PostgresHandler:
         self._connection.commit()
         cursor.close()
     
+    def clear_table(self, name: str):
+        cursor = self._connection.cursor()
+        cursor.execute(f"DELETE FROM {name}")
+        self._connection.commit()
+        cursor.close()
+
     def check_row_exists(self, table_name: str, column_name: str, value: str):
         cursor = self._connection.cursor()
         query = f"SELECT 1 FROM {table_name} WHERE {column_name} = %s"
@@ -202,7 +207,20 @@ def verify_answers():
         return jsonify({"success": True})
     else:
         return jsonify({"success": False})
-    
+
+@app.route("/api/clear_sessions")
+def clear_sessions():
+    auth = request.headers.get("Authorization")
+    stored_auth = os.environ.get("AUTHORIZATION")
+    if auth != stored_auth:
+        return jsonify({"error": "Unauthorized"}), 401
+    server = create_database_connection()
+    if server.check_health() is False:
+        return jsonify({"error": "Cannot connect to verification database"}), 500
+    server.clear_table("sessions")
+    server.close_connection()
+    return jsonify({"success": True})
+
 
 if __name__ == "__main__":
     app.run(debug=True)
