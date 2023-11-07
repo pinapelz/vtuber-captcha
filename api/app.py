@@ -212,7 +212,8 @@ def verify_answers():
 def clear_sessions():
     auth = request.headers.get("Authorization")
     stored_auth = os.environ.get("AUTHORIZATION")
-    if auth != stored_auth:
+    cron_secret = os.environ.get("CRON_SECRET")
+    if auth != stored_auth or auth != cron_secret:
         return jsonify({"error": "Unauthorized"}), 401
     server = create_database_connection()
     if server.check_health() is False:
