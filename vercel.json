@@ -10,5 +10,11 @@
         "src":"/(.*)",
         "dest":"api/app.py"
       }
+    ],
+    "crons": [
+      {
+        "path": "/api/clear_sessions",
+        "schedule": "0 3 * * *"
+      }
     ]
   }
