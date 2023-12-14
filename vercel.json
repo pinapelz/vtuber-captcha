@@ -14,7 +14,7 @@
     "crons": [
       {
         "path": "/api/clear_sessions",
-        "schedule": "0 3 * * *"
+        "schedule": "30 2 * * *"
       }
     ]
   }
