@@ -213,6 +213,7 @@ def clear_sessions():
     auth = request.headers.get("Authorization")
     stored_auth = os.environ.get("AUTHORIZATION")
     cron_secret = os.environ.get("CRON_SECRET")
+    print("Checking if " + auth + " matches " + cron_secret)
     if auth != stored_auth or auth != cron_secret:
         return jsonify({"error": "Unauthorized"}), 401
     server = create_database_connection()
