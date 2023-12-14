@@ -211,9 +211,9 @@ def verify_answers():
 @app.route("/api/clear_sessions")
 def clear_sessions():
     auth = request.headers.get("Authorization")
-    stored_auth = os.environ.get("AUTHORIZATION")
     cron_secret = os.environ.get("CRON_SECRET")
-    if auth != stored_auth or auth != cron_secret:
+    print("Checking if " + auth + " matches " + cron_secret)
+    if auth.strip() != cron_secret.strip():
         return jsonify({"error": "Unauthorized"}), 401
     server = create_database_connection()
     if server.check_health() is False:
