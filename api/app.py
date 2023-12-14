@@ -214,7 +214,7 @@ def clear_sessions():
     stored_auth = os.environ.get("AUTHORIZATION")
     cron_secret = os.environ.get("CRON_SECRET")
     print("Checking if " + auth + " matches " + cron_secret)
-    if auth != stored_auth or auth != cron_secret:
+    if auth.strip() != stored_auth.strip() or auth.strip() != cron_secret.strip():
         return jsonify({"error": "Unauthorized"}), 401
     server = create_database_connection()
     if server.check_health() is False:
