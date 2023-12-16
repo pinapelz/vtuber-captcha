@@ -158,7 +158,8 @@ def generate_organization_captcha(org):
     question_data = [{"image": question[3], "name": question[1], "affiliation": question[2], "id": question[0] } for question in correct_answers + random_answers]
     if create_session:
         server = create_database_connection()
-        del question_data["affiliation"]
+        for question in question_data:
+            del question["affiliation"]
         session_id = secrets.token_urlsafe(16)
         solutions = []
         for question in question_data:
