@@ -153,7 +153,7 @@ def generate_organization_captcha(org):
     if server.check_health() is False:
         return jsonify({"error": "Database Connection Failed. Dynamic Affiliation Endpoint requires a PostgreSQL Connection"}), 500
     if server.check_row_exists("vtuber_data", "affiliation", org) is False:
-        return jsonify({"error": "Organization not found in Database"}), 404
+        return jsonify({"error": "Organization " + org + " was not found in the database" }), 404
     correct_answers= server.get_random_row('vtuber_data', 5, "affiliation = '"+org+"'")
     random_answers = server.get_random_row('vtuber_data', 11)
     server.close_connection()
