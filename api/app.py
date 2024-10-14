@@ -4,7 +4,9 @@ import psycopg2
 from psycopg2 import Error
 import os
 import secrets
+from dotenv import load_dotenv
 
+load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
@@ -19,14 +21,14 @@ class PostgresHandler:
         }
         self._connection = psycopg2.connect(**db_params)
         print("Handler Success")
-    
+
 
     def create_table(self, name: str, column: str):
         cursor = self._connection.cursor()
         cursor.execute(f"CREATE TABLE IF NOT EXISTS {name} ({column})")
         self._connection.commit()
         cursor.close()
-    
+
     def clear_table(self, name: str):
         cursor = self._connection.cursor()
         cursor.execute(f"DELETE FROM {name}")
@@ -44,7 +46,7 @@ class PostgresHandler:
             return True
         else:
             return False
-    
+
     def insert_row(self, table_name, column, data):
         try:
             cursor  = self._connection.cursor()
@@ -60,7 +62,7 @@ class PostgresHandler:
             if "duplicate key" not in str(err).lower():
                 return False
         return True
-    
+
     def get_rows(self, table_name: str, column: str, value: str):
         try:
             cursor = self._connection.cursor()
@@ -73,7 +75,7 @@ class PostgresHandler:
             print(f"Failed to fetch row from {table_name} WHERE {column} is {value}")
             print(e)
             return False
-    
+
     def get_random_row(self, table_name: str, count: int, condition: str = None):
         if condition is None:
             condition = "1 = 1"
@@ -88,7 +90,7 @@ class PostgresHandler:
             print(f"Failed to select random rows from {table_name}")
             print(e)
             return False
-    
+
     def check_health(self):
         cursor = self._connection.cursor()
         cursor.execute("SELECT 1")
@@ -98,7 +100,7 @@ class PostgresHandler:
             return True
         else:
             return False
-    
+
     def delete_row(self, table_name: str, column: str, value: str):
         try:
             cursor = self._connection.cursor()
@@ -113,7 +115,7 @@ class PostgresHandler:
             return False
         return True
 
-    
+
     def close_connection(self):
         self._connection.close()
 
@@ -162,7 +164,8 @@ def generate_organization_captcha(org):
         solutions = []
         for question in question_data:
             if question['affiliation'] == org:
-                solutions.append(question['id'])
+                solutions.append(str(question['id']))
+        print(solutions)
         server.insert_row("sessions", "session_id, answer", (session_id, ",".join(solutions)))
         for question in question_data:
             del question["affiliation"]
@@ -181,7 +184,7 @@ def generate_organization_captcha(org):
             if question['affiliation'] == org:
                 question['answer'] = True
             else:
-                question['answer'] = False 
+                question['answer'] = False
         return_data = {
             "category": "affiliation",
             "title": "Select all the VTubers affiliated with "+org,
@@ -197,6 +200,7 @@ def generate_organization_captcha(org):
 def verify_answers():
     session_id = request.form.get('session')
     answer = request.form.get('answer')
+    print("[Verify Answer] " + session_id + answer)
     server = create_database_connection()
     if server.check_health() is False:
         return jsonify({"error": "Cannot connect to verification database"}), 500
@@ -214,7 +218,7 @@ def verify_answers():
 def clear_sessions():
     auth = request.headers.get("Authorization")
     cron_secret = os.environ.get("CRON_SECRET")
-    print("Checking if " + auth + " matches " + cron_secret)
+    print("Recieved Request to Clear Session: Checking if " + auth + " matches " + cron_secret)
     if auth.strip() != cron_secret.strip():
         return jsonify({"error": "Unauthorized"}), 401
     server = create_database_connection()
