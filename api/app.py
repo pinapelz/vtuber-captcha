@@ -5,6 +5,7 @@ from psycopg2 import Error
 import os
 import secrets
 from dotenv import load_dotenv
+import urllib.parse
 
 load_dotenv()
 app = Flask(__name__)
@@ -148,6 +149,7 @@ def server_side_auth_demo():
 def generate_organization_captcha(org):
     server = create_database_connection()
     create_session = False
+    org = urllib.parse.unquote(org)
     if(request.args.get('auth') == "server"):
         create_session = True
     if server.check_health() is False:
