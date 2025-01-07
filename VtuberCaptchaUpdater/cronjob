@@ -1,1 +1,1 @@
-0 */2 * * * java -jar /root/VtuberCaptchaUpdater-1.0-SNAPSHOT-shaded.jar
+0 */2 * * * java -jar "/root/VtuberCaptchaUpdater-1.0-SNAPSHOT-shaded.jar"
