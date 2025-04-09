@@ -116,6 +116,21 @@ class PostgresHandler:
             return False
         return True
 
+    def get_distinct_col(self, table_name: str, column: str):
+        try:
+            cursor = self._connection.cursor()
+            query = f"SELECT DISTINCT {column} FROM {table_name}"
+            cursor.execute(query)
+            result = cursor.fetchall()
+            cursor.close()
+            return [row[0] for row in result]
+        except Error as e:
+            self._connection.rollback()
+            print(f"Failed to get unique values from {column} in {table_name}")
+            print(e)
+            return False
+
+
 
     def close_connection(self):
         self._connection.close()
@@ -145,6 +160,11 @@ def index_demo():
 def server_side_auth_demo():
     return render_template('server_auth.html')
 
+@app.route('/api/list_orgs')
+def get_available_orgs():
+    server = create_database_connection()
+    return server.get_distinct_col("vtuber_data", "affiliation")
+
 @app.route('/api/affiliation/<org>')
 def generate_organization_captcha(org):
     server = create_database_connection()
@@ -167,7 +187,6 @@ def generate_organization_captcha(org):
         for question in question_data:
             if question['affiliation'] == org:
                 solutions.append(str(question['id']))
-        print(solutions)
         server.insert_row("sessions", "session_id, answer", (session_id, ",".join(solutions)))
         for question in question_data:
             del question["affiliation"]
