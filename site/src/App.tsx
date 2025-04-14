@@ -223,7 +223,7 @@ const App: React.FC = () => {
         </a>
       </div>
       <div className="flex justify-center space-x-4">
-        <a href="https:/github.com/pinapelz/vtuber-captcha" className="hover:text-pink-600 transition-colors">
+        <a href="https://github.com/pinapelz/vtuber-captcha" className="hover:text-pink-600 transition-colors">
         GitHub
         </a>
       </div>
