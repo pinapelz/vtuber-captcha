@@ -98,7 +98,11 @@ def verify_answers():
         return jsonify({"error": "Cannot connect to verification database"}), 500
     if server.check_row_exists("sessions", "session_id", session_id) is False:
         return jsonify({"error": "Session ID not found"}), 404
-    correct_answers = server.get_rows("sessions", "session_id", session_id)[0][1].split(",")
+    session_data = server.get_rows("sessions", "session_id", session_id)
+    if not session_data:
+        server.close_connection()
+        return jsonify({"error": "Session expired or not found"}), 404
+    correct_answers = session_data[0][1].split(",")
     server.delete_row("sessions", "session_id", session_id)
     server.close_connection()
     if answer == ",".join(correct_answers):
@@ -111,7 +115,6 @@ def clear_sessions():
     auth_header = request.headers.get("Authorization")
     cron_secret = os.environ.get("CRON_SECRET")
     expected_auth = f"Bearer {cron_secret}"
-    print(f"Received Request to Clear Session: Checking if '{auth_header}' matches '{expected_auth}'")
     if not cron_secret:
         return jsonify({"error": "CRON_SECRET not configured"}), 500
     if auth_header != expected_auth:
@@ -119,7 +122,7 @@ def clear_sessions():
     server = create_database_connection()
     if server.check_health() is False:
         return jsonify({"error": "Cannot connect to verification database"}), 500
-    server.clear_table("sessions")
+    server.clear_old_sessions("sessions")
     server.close_connection()
     return jsonify({"success": True})
 

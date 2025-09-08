@@ -20,11 +20,28 @@ class PostgresHandler:
         self._connection.commit()
         cursor.close()
 
-    def clear_table(self, name: str):
+    def clear_table_by_date(self, name: str):
         cursor = self._connection.cursor()
         cursor.execute(f"DELETE FROM {name}")
         self._connection.commit()
         cursor.close()
+
+    def clear_old_sessions(self, table_name: str):
+        """Delete sessions older than 15 minutes"""
+        try:
+            cursor = self._connection.cursor()
+            query = f"DELETE FROM {table_name} WHERE created_at <= NOW() - INTERVAL '15 minutes'"
+            cursor.execute(query)
+            deleted_count = cursor.rowcount
+            self._connection.commit()
+            cursor.close()
+            print(f"Deleted {deleted_count} old sessions")
+            return deleted_count
+        except Error as e:
+            self._connection.rollback()
+            print(f"Failed to delete old sessions from {table_name}")
+            print(e)
+            return False
 
     def check_row_exists(self, table_name: str, column_name: str, value: str):
         cursor = self._connection.cursor()
