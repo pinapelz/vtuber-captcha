@@ -108,10 +108,13 @@ def verify_answers():
 
 @app.route("/api/clear_sessions")
 def clear_sessions():
-    auth = request.headers.get("Authorization")
+    auth_header = request.headers.get("Authorization")
     cron_secret = os.environ.get("CRON_SECRET")
-    print("Recieved Request to Clear Session: Checking if " + str(auth) + " matches " + str(cron_secret))
-    if auth.strip() != cron_secret.strip():
+    expected_auth = f"Bearer {cron_secret}"
+    print(f"Received Request to Clear Session: Checking if '{auth_header}' matches '{expected_auth}'")
+    if not cron_secret:
+        return jsonify({"error": "CRON_SECRET not configured"}), 500
+    if auth_header != expected_auth:
         return jsonify({"error": "Unauthorized"}), 401
     server = create_database_connection()
     if server.check_health() is False:
