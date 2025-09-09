@@ -18,10 +18,10 @@ public class Main
     private static Map<String, String> organizations = Map.of(
             "Hololive", "Hololive",
             "Nijisanji", "Nijisanji",
-            "VShojo", "VShojo",
             "idol Corp", "Idol Corp",
-            "EIEN Project", "Eien Project",
-            "Phase Connect", "Phase Connect"
+            "Phase Connect", "Phase Connect",
+            "VSpo", "VSPO!",
+            "Independents", "Independents"
     );
 
     public static HashMap<String, String> readSettings() throws IOException {

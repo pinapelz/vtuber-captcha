@@ -198,3 +198,4 @@ build/
 ### Mac OS ###
 .DS_Store
 .env*.local
+secrets.json
