@@ -4,6 +4,7 @@ from .database import PostgresHandler
 import os
 import secrets
 from dotenv import load_dotenv
+import random
 import urllib.parse
 
 load_dotenv()
@@ -47,8 +48,10 @@ def generate_organization_captcha(org):
         return jsonify({"error": "Database Connection Failed. Dynamic Affiliation Endpoint requires a PostgreSQL Connection"}), 500
     if server.check_row_exists("vtuber_data", "affiliation", org) is False:
         return jsonify({"error": "Organization " + org + " was not found in the database" }), 404
-    correct_answers= server.get_random_row('vtuber_data', 5, "affiliation = '"+org+"'")
-    random_answers = server.get_random_row('vtuber_data', 11)
+    num_correct = random.randint(5, 9)
+    num_wrong = 16 - num_correct
+    correct_answers= server.get_random_rows('vtuber_data', num_correct, "affiliation = '"+org+"'")
+    random_answers = server.get_random_rows('vtuber_data', num_wrong)
     server.close_connection()
     question_data = [{"image": question[3], "name": question[1], "affiliation": question[2], "id": question[0] } for question in correct_answers + random_answers]
     if create_session:

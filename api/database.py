@@ -84,7 +84,7 @@ class PostgresHandler:
             print(e)
             return False
 
-    def get_random_row(self, table_name: str, count: int, condition: str = None):
+    def get_random_rows(self, table_name: str, count: int, condition: str = None):
         if condition is None:
             condition = "1 = 1"
         try:
