@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request, redirect
+from flask import Flask, jsonify, request, redirect
 from flask_cors import CORS
 from .database import PostgresHandler
 import os
@@ -48,12 +48,19 @@ def generate_organization_captcha(org):
         return jsonify({"error": "Database Connection Failed. Dynamic Affiliation Endpoint requires a PostgreSQL Connection"}), 500
     if server.check_row_exists("vtuber_data", "affiliation", org) is False:
         return jsonify({"error": "Organization " + org + " was not found in the database" }), 404
-    num_correct = random.randint(5, 9)
+    num_correct = random.randint(4, 8)
     num_wrong = 16 - num_correct
     correct_answers= server.get_random_rows('vtuber_data', num_correct, "affiliation = '"+org+"'")
-    random_answers = server.get_random_rows('vtuber_data', num_wrong)
+    wrong_condition = "affiliation != '" + org + "'"
+    random_answers = server.get_random_rows('vtuber_data', num_wrong, wrong_condition)
     server.close_connection()
-    question_data = [{"image": question[3], "name": question[1], "affiliation": question[2], "id": question[0] } for question in correct_answers + random_answers]
+    if correct_answers is False or random_answers is False:
+        return jsonify({"error": "Failed to fetch VTuber data from database"}), 500
+
+    # Combine and scramble the questions
+    all_questions = correct_answers + random_answers
+    random.shuffle(all_questions)
+    question_data = [{"image": question[3], "name": question[1], "affiliation": question[2], "id": question[0] } for question in all_questions]
     if create_session:
         server = create_database_connection()
         session_id = secrets.token_urlsafe(16)

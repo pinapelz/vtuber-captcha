@@ -84,12 +84,22 @@ class PostgresHandler:
             print(e)
             return False
 
-    def get_random_rows(self, table_name: str, count: int, condition: str = None):
+    def get_random_rows(self, table_name: str, count: int, condition: str = None, unique_only: bool = False, exclude_ids: list = None):
         if condition is None:
             condition = "1 = 1"
+
+        # Add exclusion condition if exclude_ids is provided
+        if exclude_ids and len(exclude_ids) > 0:
+            id_list = ','.join(str(id) for id in exclude_ids)
+            condition = f"{condition} AND id NOT IN ({id_list})"
+
         try:
             cursor = self._connection.cursor()
-            query = f"SELECT * FROM {table_name} WHERE {condition} ORDER BY RANDOM() LIMIT {str(count)}"
+            if unique_only:
+                # Use subquery to handle DISTINCT with ORDER BY RANDOM()
+                query = f"SELECT * FROM (SELECT DISTINCT * FROM {table_name} WHERE {condition}) AS distinct_rows ORDER BY RANDOM() LIMIT {str(count)}"
+            else:
+                query = f"SELECT * FROM {table_name} WHERE {condition} ORDER BY RANDOM() LIMIT {str(count)}"
             cursor.execute(query)
             result = cursor.fetchall()
             return result
